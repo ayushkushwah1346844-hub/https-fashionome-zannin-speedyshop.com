@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speedy Shop | Trendy Fashion Store</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --primary: #ff3f6c; /* Myntra/Ajio Style Pink */
+            --secondary: #1a1a1a;
+            --text-light: #666;
+            --bg-light: #f5f5f5;
+            --white: #ffffff;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-main);
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--secondary);
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { cursor: pointer; border: none; outline: none; }
+
+        /* --- HEADER --- */
+        header {
+            background: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: var(--secondary);
+        }
+        .logo span { color: var(--primary); }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links li a {
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .nav-links li a:hover { color: var(--primary); }
+
+        .nav-icons {
+            display: flex;
+            gap: 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .cart-icon-wrapper { position: relative; }
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--primary);
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        /* --- LAYOUT & VIEWS --- */
+        .main-content { min-height: 80vh; }
+        
+        .view-section {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.4s ease;
+        }
+
+        .view-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- HERO BANNER --- */
+        .hero {
+            height: 400px;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 { font-size: 3rem; margin-bottom: 10px; text-transform: uppercase; }
+        .hero p { font-size: 1.2rem; margin-bottom: 20px; }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 12px 30px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+        .btn-primary:hover { background: #e6355c; }
+
+        /* --- PRODUCT GRID --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .product-info { padding: 15px; }
+        .brand-name { font-size: 12px; color: var(--text-light); text-transform: uppercase; font-weight: 700; }
+        .product-title { font-size: 14px; margin: 5px 0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .price { font-weight: 700; font-size: 16px; }
+        .original-price { text-decoration: line-through; color: #999; font-size: 12px; margin-left: 5px; }
+
+        .wishlist-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: #ccc;
+            transition: 0.2s;
+        }
+        .wishlist-btn:hover { color: var(--primary); }
+
+        /* --- PRODUCT DETAIL MODAL --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 900px;
+            display: flex;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .modal-img { width: 50%; height: 500px; object-fit: cover; }
+        .modal-details { padding: 40px; width: 50%; }
+        .modal-brand { color: var(--text-light); font-weight: 700; text-transform: uppercase; font-size: 14px; }
+        .modal-title { font-size: 24px; margin: 10px 0; font-weight: 600; }
+        .modal-price { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+        
+        .size-selector { margin: 20px 0; }
+        .size-btn {
+            border: 1px solid #ccc;
+            padding: 8px 15px;
+            margin-right: 10px;
+            border-radius: 4px;
+            background: white;
+        }
+        .size-btn.active { border-color: var(--secondary); background: var(--secondary); color: white; }
+
+        .add-to-cart-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+
+        /* --- CART DRAWER --- */
+        .cart-drawer {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 350px;
+            height: 100%;
+            background: white;
+            z-index: 3000;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-drawer.open { right: 0; }
+        .cart-header { padding: 20px; background: var(--secondary); color: white; display: flex; justify-content: space-between; }
+        .cart-items { flex: 1; overflow-y: auto; padding: 20px; }
+        .cart-footer { padding: 20px; border-top: 1px solid #eee; background: #f9f9f9; }
+        
+        .cart-item { display: flex; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .cart-item img { width: 60px; height: 70px; object-fit: cover; margin-right: 15px; }
+        .cart-item-details h4 { font-size: 14px; margin-bottom: 5px; }
+        .cart-item-details p { font-size: 14px; color: var(--text-light); }
+        .remove-item { color: var(--primary); font-size: 12px; cursor: pointer; margin-top: 5px; display: inline-block; }
+
+        .total-row { display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; margin-bottom: 15px; }
+        
+        /* --- CHECKOUT PAGE --- */
+        .checkout-container { display: flex; gap: 40px; margin-top: 40px; padding-bottom: 50px; }
+        .checkout-form { flex: 2; background: white; padding: 30px; border-radius: 8px; }
+        .order-summary { flex: 1; background: white; padding: 30px; border-radius: 8px; height: fit-content; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 600; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        .form-row { display: flex; gap: 15px; }
+
+        /* --- FOOTER --- */
+        footer { background: #222; color: #ddd; padding: 50px 0; margin-top: auto; }
+        .footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .footer-col h3 { color: white; margin-bottom: 20px; font-size: 16px; }
+        .footer-col ul li { margin-bottom: 10px; font-size: 14px; cursor: pointer; }
+        .footer-col ul li:hover { color: var(--primary); }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .nav-links { display: none; } /* Simple hide for mobile demo */
+            .hero h1 { font-size: 2rem; }
+            .modal-content { flex-direction: column; width: 95%; }
+            .modal-img { width: 100%; height: 300px; }
+            .modal-details { width: 100%; padding: 20px; }
+            .checkout-container { flex-direction: column; }
+            .cart-drawer { width: 100%; right: -100%; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="nav-container">
+            <div class="logo" onclick="router('home')">Speedy Shop<span>.</span></div>
+            
+            <ul class="nav-links">
+                <li><a href="#" onclick="router('home')">Home</a></li>
+                <li><a href="#" onclick="filterProducts('men')">Men</a></li>
+                <li><a href="#" onclick="filterProducts('women')">Women</a></li>
+                <li><a href="#" onclick="router('checkout')">Checkout</a></li>
+            </ul>
+
+            <div class="nav-icons">
+                <i class="fas fa-search"></i>
+                <i class="fas fa-user"></i>
+                <div class="cart-icon-wrapper" onclick="toggleCart()">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cart-count">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="main-content">
+
+        <!-- HOME VIEW -->
+        <div id="home-view" class="view-section active">
+            <div class="hero">
+                <h1>Trending Girls Fashion 2026</h1>
+                <p>Trendy T-Shirts, Hoodies and Streetwear at best price.</p>
+                <button class="btn-primary" onclick="filterProducts('women')">Shop Now</button>
+            </div>
+
+            <div class="container">
+                <h2 class="section-title">Trending Now</h2>
+                <div class="product-grid" id="trending-grid">
+                    <!-- Products injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SHOP VIEW (Men/Women) -->
+        <div id="shop-view" class="view-section">
+            <div class="container">
+                <h2 class="section-title" id="shop-title">All Products</h2>
+                <div class="product-grid" id="shop-grid">
+                    <!-- Products injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- CHECKOUT VIEW -->
+        <div id="checkout-view" class="view-section">
+            <div class="container">
+                <h2 class="section-title">Checkout</h2>
+                <div class="checkout-container">
+                    <div class="checkout-form">
+                        <h3>Shipping Details</h3>
+                        <br>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1">
+                                <label>First Name</label>
+                                <input type="text" placeholder="John">
+                            </div>
+                            <div class="form-group" style="flex:1">
+                                <label>Last Name</label>
+                                <input type="text" placeholder="Doe">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input type="text" placeholder="123 Fashion St">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1">
+                                <label>City</label>
+                                <input type="text" placeholder="New York">
+                            </div>
+                            <div class="form-group" style="flex:1">
+                                <label>Zip Code</label>
+                                <input type="text" placeholder="10001">
+                            </div>
+                        </div>
+                        <button class="btn-primary" style="width: 100%; margin-top: 20px;" onclick="alert('Order Placed Successfully!'); cart = []; updateCartUI(); router('home');">Place Order</button>
+                    </div>
+                    <div class="order-summary">
+                        <h3>Order Summary</h3>
+                        <br>
+                        <div id="checkout-items">
+                            <!-- Cart items summary -->
+                        </div>
+                        <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+                        <div class="total-row">
+                            <span>Total</span>
+                            <span id="checkout-total">₹0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3>Speedy Shop</h3>
+                <p style="font-size: 14px; line-height: 1.6;">Your one-stop shop for modern fashion. Quality, style, and comfort delivered to your door.</p>
+            </div>
+            <div class="footer-col">
+                <h3>Shop</h3>
+                <ul>
+                    <li>Men</li>
+                    <li>Women</li>
+                    <li>Accessories</li>
+                    <li>Sale</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Help</h3>
+                <ul>
+                    <li>Shipping</li>
+                    <li>Returns</li>
+                    <li>Size Guide</li>
+                    <li>Contact Us</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Follow Us</h3>
+                <ul>
+                    <li>Instagram</li>
+                    <li>Facebook</li>
+                    <li>Twitter</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- PRODUCT DETAIL MODAL -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <img src="" alt="Product" class="modal-img" id="modal-img">
+            <div class="modal-details">
+                <p class="modal-brand" id="modal-brand">Brand Name</p>
+                <h2 class="modal-title" id="modal-title">Product Title</h2>
+                <p class="modal-price" id="modal-price">₹0</p>
+                
+                <div class="size-selector">
+                    <p style="font-size: 14px; font-weight: 600; margin-bottom: 10px;">Select Size</p>
+                    <button class="size-btn" onclick="selectSize(this)">S</button>
+                    <button class="size-btn" onclick="selectSize(this)">M</button>
+                    <button class="size-btn" onclick="selectSize(this)">L</button>
+                    <button class="size-btn" onclick="selectSize(this)">XL</button>
+                </div>
+
+                <button class="add-to-cart-btn" id="modal-add-btn">Add to Cart</button>
+                <p style="margin-top: 20px; font-size: 13px; color: #666; line-height: 1.5;">
+                    Description: High-quality fabric, modern design, and perfect fit. Ideal for casual and semi-formal occasions. Machine washable.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CART DRAWER -->
+    <div class="cart-drawer" id="cart-drawer">
+        <div class="cart-header">
+            <h3>Shopping Bag</h3>
+            <i class="fas fa-times" style="cursor: pointer;" onclick="toggleCart()"></i>
+        </div>
+        <div class="cart-items" id="cart-items-container">
+            <p style="text-align: center; color: #999; margin-top: 20px;">Your bag is empty.</p>
+        </div>
+        <div class="cart-footer">
+            <div class="total-row">
+                <span>Total</span>
+                <span id="cart-total">₹0</span>
+            </div>
+            <button class="btn-primary" style="width: 100%;" onclick="router('checkout'); toggleCart();">Checkout</button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA ---
+        const products = [
+            { id: 1, title: "Classic White Tee", brand: "Roadster", price: 25, category: "men", img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=500&q=80" },
+            { id: 2, title: "Denim Jacket", brand: "Jack & Jones", price: 65, category: "men", img: "https://images.unsplash.com/photo-1523205565295-f8e916256112?auto=format&fit=crop&w=500&q=80" },
+            { id: 3, title: "Floral Summer Dress", brand: "Vogue", price: 45, category: "women", img: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=500&q=80" },
+            { id: 4, title: "Leather Biker Jacket", brand: "Zara", price: 120, category: "men", img: "https://images.unsplash.com/photo-1551028919-ac7bcb5d3c53?auto=format&fit=crop&w=500&q=80" },
+            { id: 5, title: "High-Waist Jeans", brand: "Mango", price: 55, category: "women", img: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=500&q=80" },
+            { id: 6, title: "Running Sneakers", brand: "Puma", price: 80, category: "men", img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80" },
+            { id: 7, title: "Silk Blouse", brand: "H&M", price: 35, category: "women", img: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?auto=format&fit=crop&w=500&q=80" },
+            { id: 8, title: "Casual Hoodie", brand: "Nike", price: 50, category: "men", img: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=500&q=80" },
+        ];
+
+        let cart = [];
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts('trending-grid', products);
+        });
+
+        // --- ROUTER LOGIC ---
+        function router(viewName) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            
+            // Show selected view
+            if(viewName === 'home') {
+                document.getElementById('home-view').classList.add('active');
+                renderProducts('trending-grid', products);
+            } else if (viewName === 'checkout') {
+                document.getElementById('checkout-view').classList.add('active');
+                renderCheckoutSummary();
+            } else {
+                document.getElementById('shop-view').classList.add('active');
+            }
+            
+            window.scrollTo(0, 0);
+        }
+
+        // --- PRODUCT FUNCTIONS ---
+        function filterProducts(category) {
+            const filtered = products.filter(p => p.category === category);
+            document.getElementById('shop-title').innerText = category === 'men' ? "Men's Collection" : "Women's Collection";
+            renderProducts('shop-grid', filtered);
+            router('shop');
+        }
+
+        function renderProducts(containerId, data) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            data.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <div class="wishlist-btn"><i class="far fa-heart"></i></div>
+                    <img src="${product.img}" class="product-img" onclick="openModal(${product.id})" style="cursor:pointer">
+                    <div class="product-info">
+                        <div class="brand-name">${product.brand}</div>
+                        <div class="product-title">${product.title}</div>
+                        <div class="price">₹${product.price} <span class="original-price">$${(product.price * 1.2).toFixed(0)}</span></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- MODAL LOGIC ---
+        function openModal(id) {
+            const product = products.find(p => p.id === id);
+            document.getElementById('modal-img').src = product.img;
+            document.getElementById('modal-brand').innerText = product.brand;
+            document.getElementById('modal-title').innerText = product.title;
+            document.getElementById('modal-price').innerText = '₹' + product.price;
+            document.getElementById('product-modal').style.display = 'flex';
+            
+            // Reset size selection
+            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+            
+            // Update Add button click
+            document.getElementById('modal-add-btn').onclick = () => {
+                addToCart(product);
+                closeModal();
+            };
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').style.display = 'none';
+        }
+
+        function selectSize(btn) {
+            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // Close modal if clicking outside content
+        window.onclick = function(event) {
+            const modal = document.getElementById('product-modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // --- CART LOGIC ---
+        function addToCart(product) {
+            cart.push(product);
+            updateCartUI();
+            // Simple feedback animation or toast could go here
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function toggleCart() {
+            document.getElementById('cart-drawer').classList.toggle('open');
+        }
+
+        function updateCartUI() {
+            // Update badge
+            document.getElementById('cart-count').innerText = cart.length;
+
+            // Update Drawer List
+            const container = document.getElementById('cart-items-container');
+            const totalEl = document.getElementById('cart-total');
+            
+            if (cart.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; margin-top: 20px;">Your bag is empty.</p>';
+                totalEl.innerText = '$0';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = '';
+            
+            cart.forEach((item, index) => {
+                total += item.price;
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <img src="${item.img}">
+                    <div class="cart-item-details">
+                        <h4>${item.title}</h4>
+                        <p>${item.brand}</p>
+                        <p>$${item.price}</p>
+                        <span class="remove-item" onclick="removeFromCart(${index})">Remove</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            totalEl.innerText = '₹' + total;
+        }
+
+        function renderCheckoutSummary() {
+            const container = document.getElementById('checkout-items');
+            const totalEl = document.getElementById('checkout-total');
+            
+            if (cart.length === 0) {
+                container.innerHTML = '<p>No items selected.</p>';
+                totalEl.innerText = '$0';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = '';
+            cart.forEach(item => {
+                total += item.price;
+                container.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px;">
+                        <span>${item.title}</span>
+                        <span>$${item.price}</span>
+                    </div>
+                `;
+            });
+            totalEl.innerText = '₹' + total;
+        }
+
+    </script>
+</body>
+</html>
